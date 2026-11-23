@@ -1,0 +1,407 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP RADINU QUIZ</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #080d1f, #142c50, #07111f);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .quiz-box {
+            width: 100%;
+            max-width: 600px;
+            background: #111c30;
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid #29476b;
+            box-shadow: 0 0 30px #0077ff33;
+        }
+
+        h1 {
+            text-align: center;
+            color: #38bdf8;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #a9c4df;
+        }
+
+        #timer {
+            text-align: right;
+            font-size: 18px;
+            color: #facc15;
+            font-weight: bold;
+        }
+
+        .progress-container {
+            background: #26364d;
+            height: 10px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        #progress {
+            background: #38bdf8;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        #question {
+            font-size: 22px;
+            margin: 25px 0;
+        }
+
+        .answer-btn {
+            width: 100%;
+            padding: 14px;
+            margin: 8px 0;
+            border: 1px solid #385579;
+            border-radius: 12px;
+            background: #1c2b43;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .answer-btn:hover:not(:disabled) {
+            background: #2563eb;
+            transform: scale(1.02);
+        }
+
+        .answer-btn:disabled {
+            cursor: default;
+        }
+
+        .correct {
+            background: #15803d !important;
+        }
+
+        .wrong {
+            background: #b91c1c !important;
+        }
+
+        #feedback {
+            text-align: center;
+            font-weight: bold;
+            min-height: 25px;
+            margin: 15px;
+        }
+
+        #next-btn, #start-btn, #restart-btn {
+            background: #0ea5e9;
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        #next-btn:hover, #start-btn:hover, #restart-btn:hover {
+            background: #0284c7;
+        }
+
+        #game-screen, #result-screen {
+            display: none;
+        }
+
+        #result-screen {
+            text-align: center;
+        }
+
+        #final-score {
+            font-size: 28px;
+            color: #facc15;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        #question-number {
+            color: #94a3b8;
+           }
+    </style>
+</head>
+
+<body>
+
+<div class="quiz-box">
+
+    <h1>⚡ VIP RADINU QUIZ ⚡</h1>
+    <p class="subtitle">THE ULTIMATE CHALLENGE</p>
+
+    <!-- START SCREEN -->
+    <div id="start-screen">
+        <h2 style="text-align:center">Are you ready?</h2>
+        <p style="text-align:center">10 questions. 15 seconds each. Prove your knowledge!</p>
+        <button id="start-btn" onclick="startQuiz()">START QUIZ</button>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen">
+
+        <div id="timer">⏱️ Time: 15</div>
+
+        <div class="progress-container">
+            <div id="progress"></div>
+        </div>
+
+        <p id="question-number"></p>
+        <h2 id="question"></h2>
+
+        <div id="answers"></div>
+
+        <p id="feedback"></p>
+
+        <button id="next-btn" onclick="nextQuestion()" disabled>
+            NEXT QUESTION ➜
+        </button>
+
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="result-screen">
+        <h2>🏆 QUIZ COMPLETED!</h2>
+        <p id="final-score"></p>
+        <p id="message"></p>
+        <button id="restart-btn" onclick="restartQuiz()">PLAY AGAIN</button>
+    </div>
+
+</div>
+
+<script>
+
+const questions = [
+    {
+        question: "What is 15 × 4?",
+        answers: ["45", "60", "55", "65"],
+        correct: 1
+    },
+    {
+        question: "What is the capital of Sri Lanka?",
+        answers: ["Colombo", "Kandy", "Sri Jayawardenepura Kotte", "Galle"],
+        correct: 2
+    },
+    {
+        question: "Which planet is known as the Red Planet?",
+        answers: ["Venus", "Jupiter", "Mercury", "Mars"],
+        correct: 3
+    },
+    {
+        question: "What is 144 ÷ 12?",
+        answers: ["11", "12", "14", "10"],
+        correct: 1
+    },
+    {
+        question: "Which animal is the largest on Earth?",
+        answers: ["Elephant", "Giraffe", "Blue whale", "Shark"],
+        correct: 2
+    },
+    {
+        question: "How many sides does a hexagon have?",
+        answers: ["5", "6", "7", "8"],
+        correct: 1
+    },
+    {
+        question: "Which language is used to structure web pages?",
+        answers: ["HTML", "Python", "C++", "SQL"],
+        correct: 0
+    },
+    {
+        question: "What is the chemical symbol for water?",
+        answers: ["CO2", "O2", "H2O", "NaCl"],
+        correct: 2
+    },
+    {
+        question: "How many days are in a leap year?",
+        answers: ["364", "365", "366", "367"],
+        correct: 2
+    },
+    {
+        question: "Which is the fastest land animal?",
+        answers: ["Lion", "Cheetah", "Horse", "Tiger"],
+        correct: 1
+    }
+];
+
+let currentQuestion = 0;
+let score = 0;
+let timeLeft = 15;
+let timer;
+let answered = false;
+
+function startQuiz() {
+    document.getElementById("start-screen").style.display = "none";
+    document.getElementById("game-screen").style.display = "block";
+
+    currentQuestion = 0;
+    score = 0;
+
+    showQuestion();
+}
+
+function showQuestion() {
+    answered = false;
+    timeLeft = 15;
+
+    document.getElementById("timer").textContent = "⏱️ Time: " + timeLeft;
+    document.getElementById("feedback").textContent = "";
+    document.getElementById("next-btn").disabled = true;
+
+    document.getElementById("question-number").textContent =
+        "Question " + (currentQuestion + 1) + " of " + questions.length;
+
+    document.getElementById("progress").style.width =
+        (currentQuestion / questions.length) * 100 + "%";
+
+    const q = questions[currentQuestion];
+
+    document.getElementById("question").textContent = q.question;
+
+    const answersBox = document.getElementById("answers");
+    answersBox.innerHTML = "";
+
+    q.answers.forEach((answer, index) => {
+        const button = document.createElement("button");
+
+        button.textContent = answer;
+        button.className = "answer-btn";
+
+        button.onclick = () => checkAnswer(index, button);
+
+        answersBox.appendChild(button);
+    });
+
+    clearInterval(timer);
+    timer = setInterval(countdown, 1000);
+}
+
+function countdown() {
+    timeLeft--;
+
+    document.getElementById("timer").textContent =
+        "⏱️ Time: " + timeLeft;
+
+    if (timeLeft <= 0) {
+        clearInterval(timer);
+        timeUp();
+    }
+}
+
+function checkAnswer(index, button) {
+    if (answered) return;
+
+    answered = true;
+    clearInterval(timer);
+
+    const q = questions[currentQuestion];
+    const buttons = document.querySelectorAll(".answer-btn");
+
+    buttons.forEach(btn => btn.disabled = true);
+
+    if (index === q.correct) {
+        score++;
+        button.classList.add("correct");
+        document.getElementById("feedback").textContent = "✅ CORRECT! +1 POINT";
+    } else {
+        button.classList.add("wrong");
+        buttons[q.correct].classList.add("correct");
+        document.getElementById("feedback").textContent = "❌ WRONG ANSWER!";
+    }
+
+    document.getElementById("next-btn").disabled = false;
+}
+
+function timeUp() {
+    if (answered) return;
+
+    answered = true;
+
+    const q = questions[currentQuestion];
+    const buttons = document.querySelectorAll(".answer-btn");
+
+    buttons.forEach(btn => btn.disabled = true);
+
+    buttons[q.correct].classList.add("correct");
+
+    document.getElementById("feedback").textContent = "⌛ TIME'S UP!";
+    document.getElementById("next-btn").disabled = false;
+}
+
+function nextQuestion() {
+    if (!answered) return;
+
+    clearInterval(timer);
+
+    currentQuestion++;
+
+    if (currentQuestion < questions.length) {
+        showQuestion();
+    } else {
+        showResults();
+    }
+}
+
+function showResults() {
+    clearInterval(timer);
+
+    document.getElementById("game-screen").style.display = "none";
+    document.getElementById("result-screen").style.display = "block";
+
+    let percentage = (score / questions.length) * 100;
+
+    document.getElementById("final-score").textContent =
+        score + " / " + questions.length + "  (" + percentage + "%)";
+
+    if (score === 10) {
+        document.getElementById("message").textContent =
+            "🏆 PERFECT SCORE! YOU ARE A QUIZ MASTER!";
+    } else if (score >= 7) {
+        document.getElementById("message").textContent =
+            "🔥 AMAZING JOB! YOU ARE A PRO!";
+    } else if (score >= 5) {
+        document.getElementById("message").textContent =
+            "👍 GOOD WORK! KEEP TRAINING!";
+    } else {
+        document.getElementById("message").textContent =
+            "💪 KEEP PRACTICING! YOU CAN DO BETTER!";
+    }
+
+    document.getElementById("progress").style.width = "100%";
+}
+
+function restartQuiz() {
+    clearInterval(timer);
+
+    document.getElementById("result-screen").style.display = "none";
+    document.getElementById("start-screen").style.display = "block";
+}
+
+</script>
+
+</body>
+</html>
